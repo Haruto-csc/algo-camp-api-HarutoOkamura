@@ -35,6 +35,15 @@ def read_users_list(db: Session = Depends(get_db)):
         for u in results
     ]
 
+@router.get("/{user_id}")
+def read_single_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="指定されたアカウントが見つかりません")
+    user_dict = user.model_dump()
+    user_dict.pop("login_password", None)
+    return user_dict
+
 @router.post("", status_code=201)
 def create_user(
     user_data: UserCreate,
