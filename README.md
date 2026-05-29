@@ -46,7 +46,7 @@ fastapi dev
 ## ディレクトリ構成
 
 主要なディレクトリと役割の概要です。
-
+```bash
 .
 ├── main.py
 ├── database.py
@@ -59,3 +59,4 @@ fastapi dev
     ├── contests.py
     ├── problems.py
     └── users.py
+```
