@@ -5,10 +5,7 @@ from database import engine
 from models.users import User
 from pydantic import BaseModel
 from datetime import datetime, timezone
-# from typing import Optional
-# from passlib.context import CryptContext
 
-# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 router = APIRouter(prefix="/users", tags=["users"])
 
 def get_db():
@@ -19,17 +16,11 @@ class UserCreate(BaseModel):
     name: str
     login_id: str
     login_password: str
-    # is_admin: bool
-    # created_at: datetime
-    # updated_at: datetime
-    # logined_at: Optional[datetime]
-
 
 @router.get("")
 def read_users_list(db: Session = Depends(get_db)):
     statement = select(User.id, User.name, User.login_id, User.login_password)
     results = db.exec(statement).all()
-
     return [
         {"id": u.id, "name": u.name, "login_id": u.login_id}
         for u in results
@@ -59,7 +50,6 @@ def create_user(
     db.refresh(new_user)
     return new_user
 
-
 @router.put("/{user_id}")
 def update_user(
     user_id: int,
@@ -80,7 +70,6 @@ def update_user(
         raise HTTPException(status_code=400, detail="アカウント名が既に存在します")
     db.refresh(db_user)
     return db_user
-
 
 @router.delete("/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):

@@ -22,8 +22,6 @@ class ContestCreate(BaseModel):
     is_active: bool
     problem_ids: list[int]
 
-
-
 @router.get("/{contest_type}")
 def read_contests_list(
     contest_type: int,
@@ -42,7 +40,6 @@ def read_contests_list(
         for c in results
     ]
 
-
 @router.get("/{contest_id}/contest")
 def read_single_contest(contest_id: int, db: Session = Depends(get_db)):
     contest = db.get(Contest, contest_id)
@@ -51,21 +48,15 @@ def read_single_contest(contest_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="指定された問題が見つかりません")
     return contest
 
-
 @router.post("", status_code=201)
 def create_problem(
     contest_data: ContestCreate,
     db: Session = Depends(get_db)
 ):
-    # if contest_data.end_time <= contest_data.start_time:
-    #     raise HTTPException(
-    #         status_code=400,
-    #     )
     contest_new_data = contest_data.model_dump()
     problem_ids = contest_new_data.pop("problem_ids")
     new_contest = Contest(**contest_new_data)
     db.add(new_contest)
-    # なくてもいいかもだけど一応（重複を通知）
     try:
         db.commit()
     except IntegrityError:
@@ -82,8 +73,6 @@ def create_problem(
     db.commit()
     return new_contest
 
-
-
 @router.put("/{contest_id}")
 def update_problem(
     contest_id: int,
@@ -98,13 +87,11 @@ def update_problem(
     for key, value in data_dict.items():
         setattr(db_contest, key, value)
     db.add(db_contest)
-    # contest_problemsを削除
     old_associations = db.exec(
         select(ContestProblem).where(ContestProblem.contest_id == contest_id)
     ).all()
     for old_assoc in old_associations:
         db.delete(old_assoc)
-    # contest_problemsを再登録
     for index, p_id in enumerate(problem_ids):
         new_assoc = ContestProblem(
             contest_id=db_contest.id,
@@ -146,5 +133,4 @@ def force_delete_contest(contest_id: int, db: Session = Depends(get_db)):
         db.delete(assoc)
     db.delete(contest)
     db.commit()
-    return #{"message": f"物理削除しました"}
-
+    return
